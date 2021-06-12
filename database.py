@@ -29,10 +29,10 @@ def get_alarms(aid=""):
     
     try:
         if aid == "":
-            alarms = list(mongo_db.find({}))
+            alarms = list(mongo_db.alarms.find({}))
             if not alarms: log.warning("Could not locate any alarm objects from mongo store...")
         else:
-            alarms = list(mongo_db.find_one({"_id": ObjectId(aid)}))
+            alarms = list(mongo_db.alarms.find_one({"_id": ObjectId(aid)}))
             if not alarms:
                 log.exception("Could not fetch alarm object. Unmatched aid AID[%s]" % aid)
                 return MISSING_ALARM
@@ -87,7 +87,7 @@ def edit_alarm(obj):
 
     try:
         obj["_id"] = ObjectId(obj["_id"])
-        to_edit = mongo_db.find_one({"_id": obj["_id"]})
+        to_edit = mongo_db.alarms.find_one({"_id": obj["_id"]})
         if not to_edit:
             log.exception("Could not edit alarm object. Alarm object not found AID[%s]" % str(obj["_id"]))
             return MISSING_ALARM
@@ -105,7 +105,7 @@ def delete_alarm(aid):
     """ Deletes alarm from database. Returns operation code. """
 
     try:
-        to_remove = mongo_db.find_one({"_id": ObjectId(aid)})
+        to_remove = mongo_db.alarms.find_one({"_id": ObjectId(aid)})
         if not to_remove:
             log.exception("Failed to remove alarm object. Alarm object not AID[%s]" % aid)
             return MISSING_ALARM
@@ -177,7 +177,7 @@ def validate_prop(prop, value):
 #     """ Updates alarm property tiles. Returns (tiles, mission_left), else (error code, 0) """
 
 #     try:
-#         to_edit = mongo_db.find_one({"id": ObjectId(aid)})
+#         to_edit = mongo_db.alarms.find_one({"id": ObjectId(aid)})
 #         if not to_edit: raise TypeError
 #         mongo_db.update_one({"_id": ObjectId(aid)}, {"$set": {"tiles": tiles}}, upsert=True)
 #         return get_tiles(aid)
