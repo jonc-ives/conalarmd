@@ -71,7 +71,7 @@ def new_alarm(obj):
 
     try:
         res = mongo_db.alarms.insert_one(obj)
-        obj["_id"] = res.insertedId
+        obj["_id"] = res.inserted_id
         return obj
     except:
         log.exception("Could not create new alarm object")
