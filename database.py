@@ -126,31 +126,31 @@ def validate_alarm(obj):
     # these must exist of the right type
     if not obj.has_key("time_of_day"):
         return MISSING_TOD
-    else if not isinstance(obj["time_of_day"], int):
+    elif not isinstance(obj["time_of_day"], int):
         return INVALID_TOD
-    else if not obj.has_key("days_of_week"):
+    elif not obj.has_key("days_of_week"):
         return MISSING_DOW
-    else if not isinstance(obj["days_of_week"], int):
+    elif not isinstance(obj["days_of_week"], int):
         return INVALID_DOW
-    else if not obj.has_key("title"):
+    elif not obj.has_key("title"):
         return MISSING_TITLE
-    else if not isinstance(obj["title"], str):
+    elif not isinstance(obj["title"], str):
         return INVALID_TITLE
-    else if not obj.has_key("mission_count"):
+    elif not obj.has_key("mission_count"):
         return MISSING_MISSION_CNT
-    else if not isinstance(obj["mission_count"], int):
+    elif not isinstance(obj["mission_count"], int):
         return INVALID_MISSION_CNT
     
     # this must be of the right type
     if not obj.has_key("mission_left"):
         obj["mission_left"] = obj["mission_count"]
-    else if not isinstance(obj["mission_left"], int):
+    elif not isinstance(obj["mission_left"], int):
         return INVALID_MISSION_LFT
     
     # this must be of the right type
     if not obj.has_key("firing"):
         obj["firing"] = False
-    else if not isinstance(obj["firing"], bool):
+    elif not isinstance(obj["firing"], bool):
         return INVALID_FIRING
 
     return obj
@@ -161,15 +161,15 @@ def validate_prop(prop, value):
 
     if prop == "time_of_day":
         return OP_SUCCESS if value in range(1, 60*60*24) else INVALID_TOD
-    else if prop == "days_of_week":
+    elif prop == "days_of_week":
         return OP_SUCCESS if value in range(0, 2^6) else INVALID_DOW
-    else if prop == "title":
+    elif prop == "title":
         return OP_SUCCESS if isinstance(value, str) else INVALID_TITLE
-    else if prop == "mission_count":
+    elif prop == "mission_count":
         return OP_SUCCESS if value in range(0, 20) else INVALID_MISSION_CNT
-    else if prop == "mission_left":
+    elif prop == "mission_left":
         return OP_SUCCESS if value in range(0, 20) else INVALID_MISSION_LFT
-    else if prop == "firing":
+    elif prop == "firing":
         return OP_SUCCESS if isinstance(value, bool) else INVALID_FIRING
     return INVALID_PROPERTY
 
@@ -227,7 +227,7 @@ def validate_prop(prop, value):
 #     try:
 #         to_fetch = mongo_db.find_one({"id": ObjectId(aid)})
 #         if not to_fetch: raise TypeError
-#         else if not to_fetch.is_key("tiles") or not to_fetch.is_key("mission_left"):
+#         elif not to_fetch.is_key("tiles") or not to_fetch.is_key("mission_left"):
 #             missing = to_fetch.is_key("tiles") ? "mission_left" : "tiles" 
 #             raise KeyError
 #         return to_fetch["tiles"], to_fetch["mission_left"]
