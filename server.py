@@ -5,67 +5,81 @@
 
 from flask import Flask, jsonify, render_template, request
 from flask_restful import Resource, Api
-import numpy
+from globals import *
+import numpy, logging
+
+# activate file-level logger
+log = logging.getLogger(__name__)
 
 class AlarmInfo(Resource):
 
     def get(self):
-        alarms = database.get_alarms()
-        if not isinstance(alarms, object):
-            return 500, jsonify({"msg": alarms, "firing": False})
+        """ Prepares and sends alarm objects to client. Returns {"error":..}, {"firing": <obj>alarm},
+        {"alarms": [<obj>]alarm}, depending on mongo store fetch results. """
 
-        if any(a["firing"] == True for a in alarms):
+        alarms = database.get_alarms()
+        if alarms == DATABASE_ERROR:
+            return 500, jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"})
+  
+        if any(a["firing"] for a in alarms):
             a["_id"] = str(a["_id"])
-            return jsonify({"alarms": a, "firing": True})
+            return jsonify({"firing": a})
         
         for a in alarms: a["_id"] = str(a["_id"])
-        return jsonify({"firing": False, "alarms": alarms})
+        return jsonify({"alarms": alarms})
 
     def post(self):
+        """ Handles requests for new alarm objects. Returns {"error":..}, {"new": <obj>alarm, "msg":..} """
+
         args = request.get_json(force=True)
         alarm = database.new_alarm(args)
-        if not isinstance(alarm, object):
-            if alarm == -1: return 500, jsonify({"msg": "Failed to create alarm."})
-            else: return 400, jsonify({"msg": "Invalid request [PROPERR] Field #{0}".format(alarm)})
+
+        if isinstance(alarm, int):
+            if alarm == DATABASE_ERROR:
+                return 500, jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"})
+            else: return 400, jsonify({"error": "Oops! It looks like there was a problem with your request ERR[%s]" % alarm})
+        
         alarm["_id"] = str(alarm["_id"])
         return jsonify({"new": alarm, "msg": "Alarm successfully created."})
 
 class AlarmActions(Resource):
 
     def post(self, aid):
+        """ Handles requests for editing alarm objects. Returns {"error":..}, {"edited", <obj>alarm, "msg":..} """
+
         args = request.get_json(force=True)
         alarm = database.edit_alarm(args)
-        if not isinstance(alarm, object):
-            if alarm == -1: return 500, jsonify({"msg": "Failed to edit alarm."})
-            else: return 400, jsonify({"msg": "Invalid request [PROPERR] Field #{0}".format(alarm)})
+
+        if isinstance(alarm, int):
+            if alarm == DATABASE_ERROR:
+                return 500, jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"})
+            else: return jsonify({"error": "Oops! It looks like there was a problem with your request ERR[%s]" % alarm})
+
         alarm["_id"] = str(alarm["_id"])
-        return jsonify({"edited": alarm, "msg": "Message successfully created."})
+        return jsonify({"edited": alarm, "msg": "Alarm successfully edited."})
 
     def delete(self, aid):
+        """ Handles requests to delete alarm objects from the mongo store. Returns {"error":..}, {"msg":..} """
+
         ret_code = database.delete_alarm(aid)
-        if ret_code == 0: return jsonify("msg": "Alarm successfully created.")
-        if ret_code == 1: return 500, jsonify("msg": "Failed to delete alarm.")
-        if ret_code == 2: return 400, jsonify("msg": "Could not locate indicated alarm.")
         
+        if ret_code == DATABASE_ERROR:
+            return 500, jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"})
+        else if ret_code == MISSING_ALARM:
+            return 400, jsonify({"error": "Nope. That alarm doesn't exist. Try refreshing the page..."})
+        else if ret_code == OP_SUCCESS:
+            return jsonify({"msg": "Alarm successfully removed."})
+
+        return 500, jsonify({"error": "Huh. We're currently encountering some corner-case server errors. Please try again later."})
+     
 class AlarmHandler(Resource):
 
     def get(self, aid):
         tiles = numpy.random.randint(0, 25, 5)
-        tiles = database.update_tiles(aid, tiles)
-        if not isinstance(tiles, list):
-            return 500, jsonify({"msg": "Failed to update tiles. See application log file for more information."})
-        return jsonify({"tiles": tiles})
 
     def post(self, aid):
         args = request.get_json(force=True)
-        attempt = args["titles"]
-        correct, count = database.get_tiles(aid)
-        if not isinstance(correct, list):
-            if correct == 1: return 500, jsonify({"msg": "Failed to test tile accuracy."})
-            else: return 400, jsonfiy({"msg": "Invalid request [QUERYERR]"})
-        if any(attempt[i] != correct[i] for i in range(5)):
-            return jsonify({"success": False, "count": count})
-        return jsonfiy({"success": True, "count": count})
+
 
 class APIManager:
 

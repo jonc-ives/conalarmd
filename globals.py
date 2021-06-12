@@ -1,0 +1,33 @@
+# globals.py
+
+# conalarmd -- JT Ives
+# A few globals for interfacing across utilities
+
+# success codes
+OP_SUCCESS = 1
+
+# basic error codes
+DATABASE_ERROR = 100
+INVALID_PROPERTY = 110
+MISSING_PROPERTY = 120
+INVALID_OBJECT = 130
+
+# database operations
+MISSING_ALARM = 101
+MISSING_ALARM_PROP = 102
+
+# invalid properties
+INVALID_TOD = 111
+INVALID_DOW = 112
+INVALID_TITLE = 113
+INVALID_MISSION_CNT = 114
+INVALID_MISSION_LFT = 115
+INVALID_FIRING = 116
+
+# missing properties
+MISSING_TOD = 121
+MISSING_DOW = 122
+MISSING_TITLE = 123
+MISSING_MISSION_CNT = 124
+MISSING_ID = 125
+MISSING_TILES = 126
