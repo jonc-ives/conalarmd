@@ -49,7 +49,7 @@ def get_alarm_prop(aid, prop):
     try:
         alarm = mongo_db.alarms.find_one({"_id": ObjectId(aid)})
         if not alarm: raise TypeError
-        if not alarm.has_key(prop): return KeyError
+        if not alarm.get(prop): return KeyError
         return alarm[prop]
     except TypeError:
         log.exception("Failed to fetch alarm property '%s'. Missing alarm object AID[%s]" % prop, aid)
@@ -124,31 +124,31 @@ def validate_alarm(obj):
         return INVALID_OBJECT
 
     # these must exist of the right type
-    if not obj.has_key("time_of_day"):
+    if not obj.get("time_of_day"):
         return MISSING_TOD
     elif not isinstance(obj["time_of_day"], int):
         return INVALID_TOD
-    elif not obj.has_key("days_of_week"):
+    elif not obj.get("days_of_week"):
         return MISSING_DOW
     elif not isinstance(obj["days_of_week"], int):
         return INVALID_DOW
-    elif not obj.has_key("title"):
+    elif not obj.get("title"):
         return MISSING_TITLE
     elif not isinstance(obj["title"], str):
         return INVALID_TITLE
-    elif not obj.has_key("mission_count"):
+    elif not obj.get("mission_count"):
         return MISSING_MISSION_CNT
     elif not isinstance(obj["mission_count"], int):
         return INVALID_MISSION_CNT
     
     # this must be of the right type
-    if not obj.has_key("mission_left"):
+    if not obj.get("mission_left"):
         obj["mission_left"] = obj["mission_count"]
     elif not isinstance(obj["mission_left"], int):
         return INVALID_MISSION_LFT
     
     # this must be of the right type
-    if not obj.has_key("firing"):
+    if not obj.get("firing"):
         obj["firing"] = False
     elif not isinstance(obj["firing"], bool):
         return INVALID_FIRING
