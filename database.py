@@ -17,7 +17,7 @@ mongoURI = "127.0.0.1"
 mongoDB = "conalarm"
 mongoAlarms = "alarms"
 mongoLogs = "logs"
-mongoPort = "27017"
+mongoPort = 27017
 
 # database instances
 mongo_connection = MongoClient(mongoURI, mongoPort)
