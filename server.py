@@ -83,7 +83,7 @@ class AlarmHandler(Resource):
 
 class APIManager:
 
-    def __init__(init):
+    def __init__(self):
         self.app = Flask(__name__, template_folder=os.path.dirname(os.path.abspath("application.py")))
         self.api = Api(app)
 
