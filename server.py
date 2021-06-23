@@ -65,9 +65,9 @@ class AlarmActions(Resource):
         
         if ret_code == DATABASE_ERROR:
             return 500, jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"})
-        else if ret_code == MISSING_ALARM:
+        elif ret_code == MISSING_ALARM:
             return 400, jsonify({"error": "Nope. That alarm doesn't exist. Try refreshing the page..."})
-        else if ret_code == OP_SUCCESS:
+        elif ret_code == OP_SUCCESS:
             return jsonify({"msg": "Alarm successfully removed."})
 
         return 500, jsonify({"error": "Huh. We're currently encountering some corner-case server errors. Please try again later."})

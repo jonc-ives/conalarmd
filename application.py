@@ -32,7 +32,7 @@ class Session(Daemon):
             if not isinstance(alarms, list):
                 log.exception("Requested alarms is not a list of objects")
             # manage any firing alarms
-            else if any(self.is_firing(a["time_of_day"], a["days_of_week"]) for a in alarms):
+            elif any(self.is_firing(a["time_of_day"], a["days_of_week"]) for a in alarms):
                 manage_active_alarm(a["_id"])           
 
     def is_firing(self, tod, dow):
