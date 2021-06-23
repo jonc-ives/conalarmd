@@ -49,7 +49,7 @@ def get_alarm_prop(aid, prop):
     try:
         alarm = mongo_db.alarms.find_one({"_id": ObjectId(aid)})
         if not alarm: raise TypeError
-        if not alarm.get(prop): return KeyError
+        if not alarm.get(prop): raise KeyError
         return alarm[prop]
     except TypeError:
         log.exception("Failed to fetch alarm property '%s'. Missing alarm object AID[%s]" % prop, aid)
@@ -58,7 +58,7 @@ def get_alarm_prop(aid, prop):
         log.exception("Failed to fetch alarm property '%s'. Missing propery '%s' AID[%s]" % prop, prop, aid)
         return MISSING_ALARM_PROP
     except:
-        log.exception("Failed to fetch alarm property '%s' AID[%s]" % prop, aid)
+        log.exception("Failed to fetch alarm property '%s' AID[%s]" % (prop, aid))
         return DATABASE_ERROR
         
 def new_alarm(obj):
@@ -109,7 +109,7 @@ def delete_alarm(aid):
         if not to_remove:
             log.exception("Failed to remove alarm object. Alarm object not AID[%s]" % aid)
             return MISSING_ALARM
-        mongo_db.delete_one({"_id": ObjectId(aid)})
+        mongo_db.alarms.delete_one({"_id": ObjectId(aid)})
         return OP_SUCCESS
     except:
         log.exception("Failed to remove alarm AID[%s]" % aid)
