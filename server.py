@@ -19,7 +19,7 @@ class AlarmInfo(Resource):
 
         alarms = database.get_alarms()
         if alarms == DATABASE_ERROR:
-            return 500, jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"})
+            return jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"}), 500
   
         if any(a["firing"] for a in alarms):
             a["_id"] = str(a["_id"])
