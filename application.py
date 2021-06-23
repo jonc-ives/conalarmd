@@ -6,7 +6,7 @@
 import logger, logging
 import sys, time, os, database
 from daemon import Daemon
-from server import ApiManager
+from server import APIManager
 from playsound import playsound
 
 # activate file-level logger
@@ -19,7 +19,7 @@ class Session(Daemon):
         """ Overrides parent. Only called after process is daemonized. 
         Manages the applications session. """
 
-        api = ApiManager()
+        api = APIManager()
         api.app.run()
         # configures external alarm handlers
         self.initialize_managers()

@@ -85,9 +85,9 @@ class APIManager:
 
     def __init__(self):
         self.app = Flask(__name__, template_folder=os.path.dirname(os.path.abspath("application.py")))
-        self.api = Api(app)
+        self.api = Api(self.app)
 
-        @app.route('/', methods=['GET'])
+        @self.app.route('/', methods=['GET'])
         def Index(): # index endpoint (simple flask)
             return render_template("index.html")
 
