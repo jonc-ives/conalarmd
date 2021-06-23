@@ -19,7 +19,7 @@ class AlarmInfo(Resource):
 
         alarms = database.get_alarms()
         if alarms == DATABASE_ERROR:
-            return jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"}), 500
+            return jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"})
   
         if any(a["firing"] for a in alarms):
             a["_id"] = str(a["_id"])
@@ -36,8 +36,8 @@ class AlarmInfo(Resource):
 
         if isinstance(alarm, int):
             if alarm == DATABASE_ERROR:
-                return jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"}), 500
-            else: return jsonify({"error": "Oops! It looks like there was a problem with your request ERR[%s]" % alarm}), 400
+                return jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"})
+            else: return jsonify({"error": "Oops! It looks like there was a problem with your request ERR[%s]" % alarm})
         
         alarm["_id"] = str(alarm["_id"])
         return jsonify({"new": alarm, "msg": "Alarm successfully created."})
@@ -52,8 +52,8 @@ class AlarmActions(Resource):
 
         if isinstance(alarm, int):
             if alarm == DATABASE_ERROR:
-                return jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"}), 500
-            else: return jsonify({"error": "Oops! It looks like there was a problem with your request ERR[%s]" % alarm}), 400
+                return jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"})
+            else: return jsonify({"error": "Oops! It looks like there was a problem with your request ERR[%s]" % alarm})
 
         alarm["_id"] = str(alarm["_id"])
         return jsonify({"edited": alarm, "msg": "Alarm successfully edited."})
@@ -64,9 +64,9 @@ class AlarmActions(Resource):
         ret_code = database.delete_alarm(aid)
         
         if ret_code == DATABASE_ERROR:
-            return jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"}), 500
+            return jsonify({"error": "Uh oh! The application encountered some errors. Try again in a few minutes"})
         elif ret_code == MISSING_ALARM:
-            return jsonify({"error": "Nope. That alarm doesn't exist. Try refreshing the page..."}), 400
+            return jsonify({"error": "Nope. That alarm doesn't exist. Try refreshing the page..."})
         elif ret_code == OP_SUCCESS:
             return jsonify({"msg": "Alarm successfully removed."})
 
