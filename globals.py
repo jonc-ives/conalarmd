@@ -15,6 +15,7 @@ INVALID_OBJECT = 130
 # database operations
 MISSING_ALARM = 101
 MISSING_ALARM_PROP = 102
+INVALID_ALARM_KEY = 103
 
 # invalid properties
 INVALID_TOD = 111

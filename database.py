@@ -101,13 +101,31 @@ def edit_alarm_prop(aid, prop, value):
     """ Validates prop value pair. Edits database alarm object. Returns
     adjusted object on success. Returns error code on failure. """
 
+    valid = validate_prop(prop, value)
+    if valid != OP_SUCCESS:
+        return valid
+
+    try:
+        to_edit = mongo_db.alarms.find_one({"_id": ObjectId(aid)})
+        if not to_edit:
+            log.exception("Failed to edit alarm property '%s'. Alarm object not found AID[%s]" % (prop, aid))
+            return MISSING_ALARM
+
+        qparams = { "$set": { prop: value } }
+        mongo_db.alarms.update_one({"_id": ObjectId(aid)}, qparams)
+        return mongo_db.alarms.find_one({"_id": ObjectId(aid)})
+
+    except:
+        log.exception("Failed to edit alarm property '%s' AID[%s]" % (prop, aid))
+        return DATABASE_ERROR
+
 def delete_alarm(aid):
     """ Deletes alarm from database. Returns operation code. """
 
     try:
         to_remove = mongo_db.alarms.find_one({"_id": ObjectId(aid)})
         if not to_remove:
-            log.exception("Failed to remove alarm object. Alarm object not AID[%s]" % aid)
+            log.exception("Failed to remove alarm object. Alarm object not found AID[%s]" % aid)
             return MISSING_ALARM
         mongo_db.alarms.delete_one({"_id": ObjectId(aid)})
         return OP_SUCCESS
@@ -171,7 +189,7 @@ def validate_prop(prop, value):
         return OP_SUCCESS if value in range(0, 20) else INVALID_MISSION_LFT
     elif prop == "firing":
         return OP_SUCCESS if isinstance(value, bool) else INVALID_FIRING
-    return INVALID_PROPERTY
+    return INVALID_ALARM_KEY
 
 # def update_tiles(aid, tiles):
 #     """ Updates alarm property tiles. Returns (tiles, mission_left), else (error code, 0) """
