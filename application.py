@@ -20,7 +20,7 @@ class Session(Daemon):
         Manages the applications session. """
 
         api = APIManager()
-        api.app.run()
+        api.app.run(host='0.0.0.0')
         # configures external alarm handlers
         self.initialize_managers()
         # begin the application session
