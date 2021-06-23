@@ -32,7 +32,7 @@ def get_alarms(aid=""):
             alarms = list(mongo_db.alarms.find({}))
             if not alarms: log.warning("Could not locate any alarm objects from mongo store...")
         else:
-            alarms = list(mongo_db.alarms.find_one({"_id": ObjectId(aid)}))
+            alarms = mongo_db.alarms.find_one({"_id": ObjectId(aid)})
             if not alarms:
                 log.exception("Could not fetch alarm object. Unmatched aid AID[%s]" % aid)
                 return MISSING_ALARM
