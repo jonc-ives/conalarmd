@@ -6,7 +6,7 @@
 from flask import Flask, jsonify, render_template, request
 from flask_restful import Resource, Api
 from globals import *
-import numpy, logging
+import numpy, logging, os
 
 # activate file-level logger
 log = logging.getLogger(__name__)
