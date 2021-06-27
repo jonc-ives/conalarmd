@@ -42,9 +42,9 @@ def get_alarms(aid=""):
         return DATABASE_ERROR
 
 def get_alarm_prop(aid, prop):
-    """ Fetches alarm property. Returns (<bool>success, value) on success.
-    Returns (<bool>success, error_code) on failure. Flag to prevent contamination
-    between error codes and int value returns. """
+    """ Fetches alarm property. Returns value on success.
+    Returns error_code on failure. Flag to prevent contamination
+    between error codes and int value returns (later). """
 
     try:
         alarm = mongo_db.alarms.find_one({"_id": ObjectId(aid)})
@@ -52,10 +52,10 @@ def get_alarm_prop(aid, prop):
         if not alarm.get(prop): raise KeyError
         return alarm[prop]
     except TypeError:
-        log.exception("Failed to fetch alarm property '%s'. Missing alarm object AID[%s]" % prop, aid)
+        log.exception("Failed to fetch alarm property '%s'. Missing alarm object AID[%s]" % (prop, aid))
         return MISSING_ALARM
     except KeyError:
-        log.exception("Failed to fetch alarm property '%s'. Missing propery '%s' AID[%s]" % prop, prop, aid)
+        log.exception("Failed to fetch alarm property '%s'. Missing property '%s' AID[%s]" % (prop, prop, aid))
         return MISSING_ALARM_PROP
     except:
         log.exception("Failed to fetch alarm property '%s' AID[%s]" % (prop, aid))
@@ -158,12 +158,10 @@ def validate_alarm(obj):
         return MISSING_MISSION_CNT
     elif not isinstance(obj["mission_count"], int):
         return INVALID_MISSION_CNT
-    
-    # this must be of the right type
-    if not obj.get("mission_left"):
-        obj["mission_left"] = obj["mission_count"]
-    elif not isinstance(obj["mission_left"], int):
-        return INVALID_MISSION_LFT
+    if not obj.get("mission_type"):
+        return MISSING_MISSION_TYPE
+    elif not isinstance(obj["mission_type"], list):
+        return INVALID_MISSION_TYPE
     
     # this must be of the right type
     if not obj.get("firing"):
@@ -180,13 +178,13 @@ def validate_prop(prop, value):
     if prop == "time_of_day":
         return OP_SUCCESS if value in range(1, 60*60*24) else INVALID_TOD
     elif prop == "days_of_week":
-        return OP_SUCCESS if value in range(0, 2^6) else INVALID_DOW
+        return OP_SUCCESS if value in range(0, 2^6 + 1) else INVALID_DOW
     elif prop == "title":
         return OP_SUCCESS if isinstance(value, str) else INVALID_TITLE
     elif prop == "mission_count":
         return OP_SUCCESS if value in range(0, 20) else INVALID_MISSION_CNT
-    elif prop == "mission_left":
-        return OP_SUCCESS if value in range(0, 20) else INVALID_MISSION_LFT
+    elif prop == "mission_type":
+        return OP_SUCCESS if isinstance(value, list) else INVALID_MISSION_LFT
     elif prop == "firing":
         return OP_SUCCESS if isinstance(value, bool) else INVALID_FIRING
     return INVALID_ALARM_KEY

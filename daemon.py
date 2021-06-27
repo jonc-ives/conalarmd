@@ -5,7 +5,7 @@
 
 import sys, os, time, atexit, signal
 
-class daemon:
+class Daemon:
     """ a customize daemon class.
 
     Usage: subclass this daemon class and override the run() method."""

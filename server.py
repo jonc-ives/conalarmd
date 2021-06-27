@@ -70,16 +70,21 @@ class AlarmActions(Resource):
         elif ret_code == OP_SUCCESS:
             return jsonify({"msg": "Alarm successfully removed."})
 
-        return 500, jsonify({"error": "Huh. We're currently encountering some corner-case server errors. Please try again later."})
+        return jsonify({"error": "Huh. We're currently encountering some corner-case server errors. Please try again later."})
      
 class AlarmHandler(Resource):
 
-    def get(self, aid):
-        tiles = numpy.random.randint(0, 25, 5)
-
     def post(self, aid):
-        args = request.get_json(force=True)
+        """ Terminates alarm with _id 'aid'. Returns {"msg":..}, {"error":..} """
 
+        args = request.get_json(force=True)
+        if args.get("complete"):
+            alarm = database.edit_alarm_prop(aid, "firing", False)
+            if isinstance(alarm, int):
+                return jsonify({"error": "Uh oh! The application ran into some errors ERR[%s]" % alarm})
+            return jsonify({"msg": "Alarm successfully terminated"})
+        
+        return jsonify({"error": "Whoops! Request is missing paramater 'tiles' [<int>]"})
 
 class APIManager:
 

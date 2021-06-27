@@ -5,6 +5,7 @@
 
 import logger, logging
 import sys, time, os, database
+from datetime import datetime
 from daemon import Daemon
 from server import APIManager
 from playsound import playsound
@@ -19,25 +20,16 @@ class Session(Daemon):
         """ Overrides parent. Only called after process is daemonized. 
         Manages the applications session. """
 
-        api = APIManager()
-        api.app.run(host='0.0.0.0')
-        # configures external alarm handlers
-        self.initialize_managers()
-        # begin the application session
-        while 1: # session loop
-            time.sleep(60)
-            # update alarm list
-            alarms = database.get_alarms()
-            # prevents key errors
-            if not isinstance(alarms, list):
-                log.exception("Requested alarms is not a list of objects")
-            # manage any firing alarms
-            elif any(self.is_firing(a["time_of_day"], a["days_of_week"]) for a in alarms):
-                manage_active_alarm(a["_id"])           
+            moment = (now_day * 24 * 60 * 60) + now_seconds
+            # adjust for alarm next week
+            if moment > fires + 10: fires += (7 * 24 * 60 * 60)
+            # now we can calculate the interval
+            temp = abs(fires - moment)
+            # store the decision
+            seconds_til = min(seconds_til, temp)
+        
+        return False if seconds_til > 3 else True
 
-    def is_firing(self, tod, dow):
-        """ Determines if an alarm should be fired. Returns bool. """
-        pass
 
     def initialize_managers(self):
         """ Reads application configuration to initialize alarm managers. """
@@ -46,13 +38,13 @@ class Session(Daemon):
 def manage_active_alarm(aid):
     """ If alarm.fire is unset, sets property and fires alarm. """
 
-        try:
-            if not database.get_fire(aid):
-                database.set_fire(aid)
-                pid = os.fork()
-                if pid != 0: return
-                fire_alarm(aid)
-        except: log.exception("Failed to initialize alarm sequence AID[%s]" % aid)
+    try:
+        if not database.get_alarm_prop(aid, "firing"):
+            database.edit_alarm_prop(aid, "firing", True)
+            pid = os.fork()
+            if pid != 0: return
+            fire_alarm(aid)
+    except: log.exception("Failed to initialize alarm sequence AID[%s]" % aid)
 
 def fire_alarm(aid):
     """ Fires and manages alarm. Terminates process on completion.
@@ -60,7 +52,7 @@ def fire_alarm(aid):
 
     while True:
         playsound('alarm.wav')
-        if not database.get_fire(aid):
+        if not database.get_alarm_prop(aid, "fire"):
             exit(0)
     
 if __name__ == "__main__":
@@ -69,4 +61,4 @@ if __name__ == "__main__":
         if 'start' == sys.argv[1]: app.start()
         elif 'stop' == sys.argv[1]: app.stop()
         elif 'restart' == sys.argv[1]: app.restart()
-    else: print "usage: %s start|stop|restart" % sys.argv[0]
+    else: print("usage: %s start|stop|restart" % sys.argv[0])
