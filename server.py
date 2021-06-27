@@ -5,11 +5,11 @@
 
 from flask import Flask, jsonify, render_template, request
 from flask_restful import Resource, Api
-import database, numpy, logging, os
+import database, numpy, os
 from globals import *
 
 # activate file-level logger
-log = logging.getLogger(__name__)
+from logger import root as log
 
 class AlarmInfo(Resource):
 

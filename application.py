@@ -3,7 +3,6 @@
 # con-alarm -- JT Ives
 # manages application logic
 
-import logger, logging
 import sys, time, os, database
 from datetime import datetime
 from daemon import Daemon
@@ -11,7 +10,7 @@ from server import APIManager
 from playsound import playsound
 
 # activate file-level logger
-log = logging.getLogger(__name__)
+from logger import root as log
 
 class Session(Daemon):
     """ Subclasses Daemon from daemon.py. Manages application logic. """
@@ -20,13 +19,13 @@ class Session(Daemon):
         """ Overrides parent. Only called after process is daemonized. 
         Manages the applications session. """
 
-            moment = (now_day * 24 * 60 * 60) + now_seconds
-            # adjust for alarm next week
-            if moment > fires + 10: fires += (7 * 24 * 60 * 60)
-            # now we can calculate the interval
-            temp = abs(fires - moment)
-            # store the decision
-            seconds_til = min(seconds_til, temp)
+        moment = (now_day * 24 * 60 * 60) + now_seconds
+        # adjust for alarm next week
+        if moment > fires + 10: fires += (7 * 24 * 60 * 60)
+        # now we can calculate the interval
+        temp = abs(fires - moment)
+        # store the decision
+        seconds_til = min(seconds_til, temp)
         
         return False if seconds_til > 3 else True
 

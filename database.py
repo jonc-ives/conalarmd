@@ -3,14 +3,13 @@
 # con-alarm -- JT Ives
 # MongoDB API interaction abstraction interface
 
-import logging
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from globals import *
 import sys
 
 # activate file-level logger
-log = logging.getLogger(__name__)
+from logger import root as log
 
 # configuration constants
 mongoURI = "127.0.0.1"
